@@ -1,5 +1,9 @@
 <Solution>
   <Project Path="MyGenerator/MyGenerator.csproj" />
+<!--#if (IncludeTests)-->
   <Project Path="MyGenerator.Tests/MyGenerator.Tests.csproj" />
+<!--#endif-->
+<!--#if (IncludeSnapshotTests)-->
   <Project Path="MyGenerator.SnapshotTests/MyGenerator.SnapshotTests.csproj" />
+<!--#endif-->
 </Solution>
