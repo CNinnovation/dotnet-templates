@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- NuGet Package Settings -->
+    <PackageType>Template</PackageType>
+    <PackageId>CNinnovation.SourceGenerator.Template</PackageId>
+    <PackageVersion>1.0.0-preview</PackageVersion>
+    <Title>.NET Source Generator Template</Title>
+    <Description>A template for creating .NET source generators with tests and snapshot testing</Description>
+    <PackageTags>dotnet-new;templates;sourcegenerator;roslyn;csharp</PackageTags>
+    <Authors>CN innovation</Authors>
+    <PackageProjectUrl>https://github.com/cninnovation/dotnet-templates</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    
+    <!-- Template Package Settings -->
+    <TargetFramework>net8.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeSymbols>false</IncludeSymbols>
+    <NoWarn>NU5128</NoWarn>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <LocalizeTemplates>false</LocalizeTemplates>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Include all template files -->
+    <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**" />
+    
+    <!-- Exclude all code files from compilation -->
+    <Compile Remove="**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.TemplateEngine.Tasks" Version="*" PrivateAssets="all" IsImplicitlyDefined="true"/>
+  </ItemGroup>
+
+</Project>

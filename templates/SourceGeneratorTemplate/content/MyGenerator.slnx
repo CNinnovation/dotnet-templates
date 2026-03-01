@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="MyGenerator/MyGenerator.csproj" />
+  <Project Path="MyGenerator.Tests/MyGenerator.Tests.csproj" />
+  <Project Path="MyGenerator.SnapshotTests/MyGenerator.SnapshotTests.csproj" />
+</Solution>

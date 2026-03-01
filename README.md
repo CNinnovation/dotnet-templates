@@ -1,2 +1,3 @@
-# sourcegenerators-templates
-Templates for C# source generators
+# Templates for dotnet new
+
+## Source generator template
