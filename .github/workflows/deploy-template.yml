@@ -1,0 +1,45 @@
+name: Deploy Template to NuGet
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Package version (e.g., 1.0.0 or 1.0.0-preview)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '8.x'
+    
+    - name: Update package version
+      run: |
+        sed -i 's/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>${{ github.event.inputs.version }}<\/PackageVersion>/' templates/SourceGeneratorTemplate/SourceGenerator.Template.csproj
+    
+    - name: Pack template
+      run: dotnet pack templates/SourceGeneratorTemplate/SourceGenerator.Template.csproj --configuration Release --output ./artifacts
+    
+    - name: Push to NuGet
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+    
+    - name: Create Git tag
+      if: success()
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git tag -a "v${{ github.event.inputs.version }}" -m "Release version ${{ github.event.inputs.version }}"
+        git push origin "v${{ github.event.inputs.version }}"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
