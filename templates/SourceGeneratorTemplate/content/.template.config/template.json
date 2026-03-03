@@ -9,7 +9,7 @@
         "Testing",
         "xUnit"
     ],
-    "identity": "CNinnovation.SourceGenerator.Template",
+    "identity": "CNinnovation.Templates.SourceGenerator",
     "name": ".NET Source Generator Template with xUnit v3 and Snapshot Testing",
     "shortName": "sourcegen",
     "description": "A template that scaffolds a .NET source generator project with a unit test project using xUnit v3 and integrated snapshot testing via Verify.",
