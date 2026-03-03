@@ -13,7 +13,7 @@ This template scaffolds a complete .NET source generator solution that includes:
 Install the template (from the repository root):
 
 ```bash
-dotnet new install templates/SourceGeneratorTemplate
+dotnet new install CNinnovation.Templates.SourceGenerator
 ```
 
 Scaffold a new generator solution:
@@ -26,7 +26,7 @@ cd AwesomeGenerator
 Remove the template installation when no longer needed:
 
 ```bash
-dotnet new uninstall templates/SourceGeneratorTemplate
+dotnet new uninstall CNinnovation.Templates.SourceGenerator
 ```
 
 ---
@@ -35,7 +35,7 @@ dotnet new uninstall templates/SourceGeneratorTemplate
 
 ```
 AwesomeGenerator/
-├── AwesomeGenerator/                   # Source generator (netstandard2.0)
+├── AwesomeGenerator/                   # Source generator (net8.0)
 │   ├── AwesomeGenerator.csproj
 │   └── AwesomeGeneratorImpl.cs         # IIncrementalGenerator implementation
 │
@@ -164,7 +164,7 @@ same as in xUnit v2.
 1. Open `MyGeneratorImpl.cs` and replace the `GenerateInfo` attribute name and logic
    with your own.
 2. Update `MyGeneratorTests.cs` and `MyGeneratorSnapshotTests.cs` with tests for your
-   new behaviour.
+   new behavior.
 3. Run `dotnet test` to verify everything works.
 4. Accept new snapshots as described above.
 
