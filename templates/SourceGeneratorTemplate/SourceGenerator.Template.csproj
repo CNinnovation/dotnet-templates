@@ -26,7 +26,10 @@
   <ItemGroup>
     <!-- Include all template files -->
     <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**" />
-    
+
+    <!-- Include README for NuGet package -->
+    <None Include="content\README.md" Pack="true" PackagePath="\" />
+
     <!-- Exclude all code files from compilation -->
     <Compile Remove="**\*" />
   </ItemGroup>

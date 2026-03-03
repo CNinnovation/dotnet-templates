@@ -10,7 +10,7 @@ This template scaffolds a complete .NET source generator solution that includes:
 
 ## Using the Template
 
-Install the template (from the repository root):
+Install the template from NuGet:
 
 ```bash
 dotnet new install CNinnovation.Templates.SourceGenerator
