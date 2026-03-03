@@ -82,7 +82,7 @@ dotnet new uninstall CNinnovation.SourceGenerator.Template
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. But before you create a Pull Request, create an issue and wait for an answer!
 
 ## License
 
