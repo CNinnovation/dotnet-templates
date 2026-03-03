@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <!-- NuGet Package Settings -->
     <PackageType>Template</PackageType>
-    <PackageId>CNinnovation.SourceGenerator.Template</PackageId>
-    <PackageVersion>1.0.0-preview3</PackageVersion>
+    <PackageId>CNinnovation.Templates.SourceGenerator</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
     <Title>.NET Source Generator Template</Title>
     <Description>A template for creating .NET source generators with tests and snapshot testing</Description>
     <PackageTags>dotnet-new;templates;sourcegenerator;roslyn;csharp</PackageTags>
