@@ -10,6 +10,7 @@ namespace MyGenerator;
 /// Source generator that detects classes marked with [GenerateInfo] and generates
 /// a companion static class exposing compile-time information about the marked type.
 /// </summary>
+[Generator]
 public class MyGeneratorImpl : IIncrementalGenerator
 {
     private const string AttributeNamespace = "MyGenerator.Attributes";

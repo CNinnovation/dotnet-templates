@@ -41,13 +41,15 @@
             "type": "parameter",
             "datatype": "bool",
             "defaultValue": "true",
-            "description": "Include unit test project"
+            "description": "Include unit test project",
+            "shortName": "t"
         },
         "IncludeSnapshotTests": {
             "type": "parameter",
             "datatype": "bool",
             "defaultValue": "true",
-            "description": "Include snapshot test project"
+            "description": "Include snapshot test project",
+            "shortName": "s"
         }
     },
     "sources": [
