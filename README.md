@@ -2,13 +2,11 @@
 
 A collection of `dotnet new` templates for .NET development, designed to streamline the creation of common project types and accelerate development workflows.
 
-## Available Templates
+## Source Generator Template
 
-### Source Generator Template
+A comprehensive template for creating C# source generators with built-in testing infrastructure, including xUnit v3 and snapshot testing support.
 
-A comprehensive template for creating .NET source generators with built-in testing infrastructure, including xUnit v3 and snapshot testing support.
-
-#### Features
+### Features
 
 - **Source Generator Project** - Pre-configured Roslyn incremental source generator with `netstandard2.0` targeting
 - **xUnit v3 Test Project** - Modern testing infrastructure with the latest xUnit version
@@ -17,7 +15,7 @@ A comprehensive template for creating .NET source generators with built-in testi
 - **Optional Components** - Include/exclude unit tests and snapshot tests as needed
 - **Sample Code** - Working example to get started immediately
 
-#### Installation
+### Installation
 
 Install the template from NuGet:
 
@@ -31,7 +29,7 @@ Or install locally from the repository:
 dotnet new install ./templates/SourceGeneratorTemplate
 ```
 
-#### Usage
+### Usage
 
 Create a new source generator project with all features:
 
@@ -59,7 +57,7 @@ dotnet new sourcegen -n MyGenerator --IncludeSnapshotTests false
 dotnet new sourcegen -n MyGenerator --IncludeTests false --IncludeSnapshotTests false
 ```
 
-#### Generated Structure
+### Generated Structure
 
 ```
 MyGenerator/
@@ -68,7 +66,7 @@ MyGenerator/
 └── MyGenerator.SnapshotTests/      # Verify snapshot tests
 ```
 
-#### Uninstall
+### Uninstall
 
 ```bash
 dotnet new uninstall CNinnovation.SourceGenerator.Template
@@ -77,12 +75,12 @@ dotnet new uninstall CNinnovation.SourceGenerator.Template
 ## Requirements
 
 - .NET 8 SDK or later
-- Visual Studio 2022 or later (recommended for best source generator development experience)
+- Visual Studio 2022 17.7 or later (recommended for out-of-process source generator development experience)
 - C# 12.0 or later
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. But before you create a Pull Request, create an issue and wait for an answer!
+Contributions are welcome! Before you submit a Pull Request, create an issue to discuss it.
 
 ## License
 
