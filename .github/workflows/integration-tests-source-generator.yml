@@ -55,7 +55,7 @@ jobs:
           # .NET 10 — net10.0 generator, all test projects
           - name: "net10 | all options | net10.0 generator"
             dotnet-version: '10.x'
-            dotnet-quality: 'qa'
+            dotnet-quality: 'ga'
             framework: 'net10.0'
             generator-framework: 'net10.0'
             include-tests: 'true'
@@ -64,7 +64,7 @@ jobs:
           # .NET 10 — default generator framework (netstandard2.0), all test projects
           - name: "net10 | all options | netstandard2.0 generator"
             dotnet-version: '10.x'
-            dotnet-quality: 'qa'
+            dotnet-quality: 'ga'
             framework: 'net10.0'
             generator-framework: 'netstandard2.0'
             include-tests: 'true'
