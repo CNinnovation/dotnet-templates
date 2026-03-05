@@ -172,5 +172,5 @@ same as in xUnit v2.
 
 ## Requirements
 
-- **.NET 9.0** or later SDK
+- **.NET SDK matching the selected test TFM** (for example, `net9.0` or `net10.0`)
 - **C# 13** (LangVersion `latest` is set automatically)
