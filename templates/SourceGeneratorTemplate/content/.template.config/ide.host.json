@@ -30,6 +30,13 @@
                 "text": "Include Snapshot Tests"
             },
             "isVisible": "true"
+        },
+        {
+            "id": "SyntaxProviderMode",
+            "name": {
+                "text": "Syntax Provider Mode"
+            },
+            "isVisible": "true"
         }
     ]
 }
