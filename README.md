@@ -89,8 +89,8 @@ The workflow (`integration-tests-source-generator.yml`) exercises the following 
 | net9 \| all options \| netstandard2.0 generator | 9.x | net9.0 | netstandard2.0 | true | true |
 | net9 \| all options \| net8.0 generator | 9.x | net9.0 | net8.0 | true | true |
 | net9 \| all options \| net9.0 generator | 9.x | net9.0 | net9.0 | true | true |
-| net10 \| all options \| netstandard2.0 generator | 10.x (preview) | net10.0 | netstandard2.0 | true | true |
-| net10 \| all options \| net10.0 generator | 10.x (preview) | net10.0 | net10.0 | true | true |
+| net10 \| all options \| netstandard2.0 generator | 10.x | net10.0 | netstandard2.0 | true | true |
+| net10 \| all options \| net10.0 generator | 10.x | net10.0 | net10.0 | true | true |
 | net9 \| generator only | 9.x | net9.0 | netstandard2.0 | false | false |
 | net9 \| unit tests only | 9.x | net9.0 | netstandard2.0 | true | false |
 | net9 \| snapshot tests only | 9.x | net9.0 | netstandard2.0 | false | true |
