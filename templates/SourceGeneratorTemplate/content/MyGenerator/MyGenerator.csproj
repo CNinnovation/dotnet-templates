@@ -5,12 +5,15 @@
     <LangVersion>latest</LangVersion>
     <IsRoslynComponent>true</IsRoslynComponent>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <DevelopmentDependency>true</DevelopmentDependency>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!--#if (!IsNetStandard20)-->
     <!-- Supporting Visual Studio earlier than Visual Studio 2022 17.3 requires .NET Standard 2.0! -->
     <NoWarn>RS1041</NoWarn>
+    <!--#endif-->
   </PropertyGroup>
 
   <ItemGroup>

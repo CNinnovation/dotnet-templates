@@ -4,9 +4,16 @@
     "learnMoreLink": "https://github.com/cninnovation/dotnet-templates",
     "symbolInfo": [
         {
+            "id": "GeneratorFramework",
+            "name": {
+                "text": "Generator Target Framework"
+            },
+            "isVisible": "true"
+        },
+        {
             "id": "Framework",
             "name": {
-                "text": "Target Framework"
+                "text": "Test Target Framework"
             },
             "isVisible": "true"
         },

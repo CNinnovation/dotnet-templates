@@ -37,6 +37,35 @@
             "defaultValue": "net10.0",
             "replaces": "net10.0"
         },
+        "GeneratorFramework": {
+            "type": "parameter",
+            "description": "The target framework for the source generator project.",
+            "datatype": "choice",
+            "choices": [
+                {
+                    "choice": "netstandard2.0",
+                    "description": ".NET Standard 2.0"
+                },
+                {
+                    "choice": "net8.0",
+                    "description": ".NET 8.0"
+                },
+                {
+                    "choice": "net9.0",
+                    "description": ".NET 9.0"
+                },
+                {
+                    "choice": "net10.0",
+                    "description": ".NET 10.0"
+                }
+            ],
+            "defaultValue": "netstandard2.0",
+            "replaces": "net8.0"
+        },
+        "IsNetStandard20": {
+            "type": "computed",
+            "value": "(GeneratorFramework == \"netstandard2.0\")"
+        },
         "IncludeTests": {
             "type": "parameter",
             "datatype": "bool",
