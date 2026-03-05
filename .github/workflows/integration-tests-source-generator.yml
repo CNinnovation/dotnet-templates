@@ -97,6 +97,26 @@ jobs:
             include-tests: 'false'
             include-snapshot-tests: 'true'
 
+          # .NET 9 — ForAttributeWithMetadataName, netstandard2.0 generator
+          - name: "net9 | ForAttributeWithMetadataName | netstandard2.0 generator"
+            dotnet-version: '9.x'
+            dotnet-quality: 'ga'
+            framework: 'net9.0'
+            generator-framework: 'netstandard2.0'
+            include-tests: 'true'
+            include-snapshot-tests: 'true'
+            syntax-provider-mode: 'ForAttributeWithMetadataName'
+
+          # .NET 10 — ForAttributeWithMetadataName, net10.0 generator
+          - name: "net10 | ForAttributeWithMetadataName | net10.0 generator"
+            dotnet-version: '10.x'
+            dotnet-quality: 'ga'
+            framework: 'net10.0'
+            generator-framework: 'net10.0'
+            include-tests: 'true'
+            include-snapshot-tests: 'true'
+            syntax-provider-mode: 'ForAttributeWithMetadataName'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -113,12 +133,18 @@ jobs:
       - name: Generate project from template
         working-directory: /tmp
         run: |
+          SYNTAX_MODE="${{ matrix.syntax-provider-mode }}"
+          EXTRA_ARGS=()
+          if [ -n "$SYNTAX_MODE" ]; then
+            EXTRA_ARGS+=(--SyntaxProviderMode "$SYNTAX_MODE")
+          fi
           dotnet new sourcegen \
             --name TestGenerator \
             --Framework "${{ matrix.framework }}" \
             --GeneratorFramework "${{ matrix.generator-framework }}" \
             --IncludeTests ${{ matrix.include-tests }} \
-            --IncludeSnapshotTests ${{ matrix.include-snapshot-tests }}
+            --IncludeSnapshotTests ${{ matrix.include-snapshot-tests }} \
+            "${EXTRA_ARGS[@]}"
 
       - name: Verify generated file structure
         shell: bash

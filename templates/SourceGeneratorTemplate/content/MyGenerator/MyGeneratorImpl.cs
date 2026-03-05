@@ -32,13 +32,32 @@ public class MyGeneratorImpl : IIncrementalGenerator
         context.RegisterPostInitializationOutput(ctx =>
             ctx.AddSource("GenerateInfoAttribute.g.cs", SourceText.From(AttributeSource, Encoding.UTF8)));
 
-        // Collect all class declarations annotated with [GenerateInfo]
+//#if (UseForAttributeWithMetadataName)
+        // ForAttributeWithMetadataName directly reacts to the presence of a specific
+        // attribute on a syntax node. It is more efficient than CreateSyntaxProvider for
+        // attribute-driven generators because Roslyn can quickly filter to only the nodes
+        // that carry the attribute, avoiding unnecessary semantic model queries for every
+        // class in the compilation. Use this approach when your generator is triggered by
+        // a known attribute.
+        var classDeclarations = context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                $"{AttributeNamespace}.{AttributeName}",
+                predicate: static (node, _) => node is ClassDeclarationSyntax,
+                transform: static (ctx, _) => GetMarkedClassFromAttribute(ctx))
+            .Where(static m => m is not null)
+            .Collect();
+//#else
+        // CreateSyntaxProvider is a general-purpose approach that visits all syntax nodes.
+        // A fast syntactic predicate filters candidate nodes first, then a slower semantic
+        // transform checks them more precisely. Use this approach when you need flexible,
+        // syntax-driven detection or when no single attribute drives generation.
         var classDeclarations = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: static (node, _) => node is ClassDeclarationSyntax { AttributeLists.Count: > 0 },
                 transform: static (ctx, _) => GetMarkedClass(ctx))
             .Where(static m => m is not null)
             .Collect();
+//#endif
 
         context.RegisterSourceOutput(classDeclarations, static (spc, classes) =>
         {
@@ -53,6 +72,16 @@ public class MyGeneratorImpl : IIncrementalGenerator
         });
     }
 
+//#if (UseForAttributeWithMetadataName)
+    private static MarkedClassInfo? GetMarkedClassFromAttribute(GeneratorAttributeSyntaxContext ctx)
+    {
+        // TargetSymbol is already resolved by the framework — no manual attribute lookup needed.
+        if (ctx.TargetSymbol is INamedTypeSymbol typeSymbol)
+            return new MarkedClassInfo(typeSymbol);
+
+        return null;
+    }
+//#else
     private static MarkedClassInfo? GetMarkedClass(GeneratorSyntaxContext ctx)
     {
         var classDecl = (ClassDeclarationSyntax)ctx.Node;
@@ -75,6 +104,7 @@ public class MyGeneratorImpl : IIncrementalGenerator
 
         return null;
     }
+//#endif
 
     private static void GenerateInfoClass(SourceProductionContext context, MarkedClassInfo classInfo)
     {

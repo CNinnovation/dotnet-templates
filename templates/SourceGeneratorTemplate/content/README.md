@@ -92,8 +92,15 @@ The template implements a simple but realistic pattern:
 1. **Inject an attribute** – `GenerateInfoAttribute` is added to every compilation via
    `RegisterPostInitializationOutput`.
 
-2. **Detect marked classes** – `CreateSyntaxProvider` finds classes decorated with
-   `[GenerateInfo]`.
+2. **Detect marked classes** – one of two approaches is used (selected at scaffold time):
+   - **`CreateSyntaxProvider`** *(default)* – visits all class declarations, uses a fast
+     syntactic predicate to filter candidates, then a semantic transform to confirm the
+     attribute is present. Flexible and general-purpose.
+   - **`ForAttributeWithMetadataName`** – tells Roslyn to watch specifically for
+     `[GenerateInfo]` by its fully-qualified metadata name. Roslyn only invokes the
+     transform for nodes that already carry the attribute, making it more efficient for
+     attribute-driven generators. Recommended when a single well-known attribute triggers
+     generation.
 
 3. **Generate a companion class** – For each marked class a `<ClassName>Info` static class
    is generated containing compile-time constants (type name, property count, method count)
@@ -101,6 +108,18 @@ The template implements a simple but realistic pattern:
 
 Replace `GenerateInfoAttribute` and the corresponding generation logic in
 `MyGeneratorImpl.cs` with your own attribute and code generation.
+
+### Choosing a Syntax Provider Mode
+
+| Option | Flag | Best for |
+|--------|------|----------|
+| `CreateSyntaxProvider` | *(default)* | Any syntax-based detection; maximum flexibility |
+| `ForAttributeWithMetadataName` | `-m ForAttributeWithMetadataName` | Attribute-driven generators; better incremental performance |
+
+```bash
+# scaffold with the optimized attribute-based approach
+dotnet new sourcegen -n AwesomeGenerator -m ForAttributeWithMetadataName
+```
 
 ---
 

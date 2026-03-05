@@ -79,6 +79,27 @@
             "defaultValue": "true",
             "description": "Include snapshot test project",
             "shortName": "s"
+        },
+        "SyntaxProviderMode": {
+            "type": "parameter",
+            "description": "The syntax provider approach used to detect annotated types in the source generator. 'CreateSyntaxProvider' is general-purpose and flexible. 'ForAttributeWithMetadataName' is optimized for attribute-driven generators and is the recommended approach when generation is triggered by a known attribute.",
+            "datatype": "choice",
+            "shortName": "m",
+            "choices": [
+                {
+                    "choice": "CreateSyntaxProvider",
+                    "description": "General-purpose approach using CreateSyntaxProvider. Suitable for any syntax-based detection."
+                },
+                {
+                    "choice": "ForAttributeWithMetadataName",
+                    "description": "Optimized for attribute-based generators. Uses ForAttributeWithMetadataName which is more efficient and precise."
+                }
+            ],
+            "defaultValue": "CreateSyntaxProvider"
+        },
+        "UseForAttributeWithMetadataName": {
+            "type": "computed",
+            "value": "(SyntaxProviderMode == \"ForAttributeWithMetadataName\")"
         }
     },
     "sources": [
