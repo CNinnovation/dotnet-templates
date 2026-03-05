@@ -120,6 +120,49 @@ public class MyGeneratorImpl : IIncrementalGenerator
         context.AddSource($"{className}Info.g.cs", SourceText.From(source, Encoding.UTF8));
     }
 
+//#if (IsNetStandard20)
+    private sealed class MarkedClassInfo : System.IEquatable<MarkedClassInfo>
+    {
+        public INamedTypeSymbol TypeSymbol { get; }
+
+        public MarkedClassInfo(INamedTypeSymbol typeSymbol)
+        {
+            TypeSymbol = typeSymbol;
+            Namespace = typeSymbol.ContainingNamespace.IsGlobalNamespace
+                ? string.Empty
+                : typeSymbol.ContainingNamespace.ToDisplayString();
+            ClassName = typeSymbol.Name;
+            PropertyCount = typeSymbol.GetMembers()
+                .OfType<IPropertySymbol>()
+                .Count(p => p.DeclaredAccessibility == Accessibility.Public);
+            MethodCount = typeSymbol.GetMembers()
+                .OfType<IMethodSymbol>()
+                .Count(m => m.DeclaredAccessibility == Accessibility.Public
+                            && m.MethodKind == MethodKind.Ordinary);
+        }
+
+        public string Namespace { get; }
+        public string ClassName { get; }
+        public int PropertyCount { get; }
+        public int MethodCount { get; }
+
+        public bool Equals(MarkedClassInfo? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return SymbolEqualityComparer.Default.Equals(TypeSymbol, other.TypeSymbol);
+        }
+
+        public override bool Equals(object? obj) => Equals(obj as MarkedClassInfo);
+
+        public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(TypeSymbol);
+
+        public static bool operator ==(MarkedClassInfo? left, MarkedClassInfo? right) =>
+            left is null ? right is null : left.Equals(right);
+
+        public static bool operator !=(MarkedClassInfo? left, MarkedClassInfo? right) => !(left == right);
+    }
+//#else
     private sealed record MarkedClassInfo(INamedTypeSymbol TypeSymbol)
     {
         public string Namespace { get; } = TypeSymbol.ContainingNamespace.IsGlobalNamespace
@@ -137,4 +180,5 @@ public class MyGeneratorImpl : IIncrementalGenerator
                 .Count(m => m.DeclaredAccessibility == Accessibility.Public
                             && m.MethodKind == MethodKind.Ordinary);
     }
+//#endif
 }
