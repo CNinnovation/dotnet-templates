@@ -134,13 +134,17 @@ jobs:
         working-directory: /tmp
         run: |
           SYNTAX_MODE="${{ matrix.syntax-provider-mode }}"
+          EXTRA_ARGS=()
+          if [ -n "$SYNTAX_MODE" ]; then
+            EXTRA_ARGS+=(--SyntaxProviderMode "$SYNTAX_MODE")
+          fi
           dotnet new sourcegen \
             --name TestGenerator \
             --Framework "${{ matrix.framework }}" \
             --GeneratorFramework "${{ matrix.generator-framework }}" \
             --IncludeTests ${{ matrix.include-tests }} \
             --IncludeSnapshotTests ${{ matrix.include-snapshot-tests }} \
-            ${SYNTAX_MODE:+--SyntaxProviderMode "$SYNTAX_MODE"}
+            "${EXTRA_ARGS[@]}"
 
       - name: Verify generated file structure
         shell: bash
