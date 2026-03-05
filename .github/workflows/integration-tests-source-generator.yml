@@ -1,0 +1,189 @@
+name: Integration Tests - Source Generator Template
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'templates/SourceGeneratorTemplate/**'
+      - '.github/workflows/integration-tests-source-generator.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'templates/SourceGeneratorTemplate/**'
+      - '.github/workflows/integration-tests-source-generator.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration-tests:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # .NET 9 — default generator framework (netstandard2.0), all test projects
+          - name: "net9 | all options | netstandard2.0 generator"
+            dotnet-version: '9.x'
+            dotnet-quality: 'ga'
+            framework: 'net9.0'
+            generator-framework: 'netstandard2.0'
+            include-tests: 'true'
+            include-snapshot-tests: 'true'
+
+          # .NET 9 — net8.0 generator, all test projects
+          - name: "net9 | all options | net8.0 generator"
+            dotnet-version: '9.x'
+            dotnet-quality: 'ga'
+            framework: 'net9.0'
+            generator-framework: 'net8.0'
+            include-tests: 'true'
+            include-snapshot-tests: 'true'
+
+          # .NET 9 — net9.0 generator, all test projects
+          - name: "net9 | all options | net9.0 generator"
+            dotnet-version: '9.x'
+            dotnet-quality: 'ga'
+            framework: 'net9.0'
+            generator-framework: 'net9.0'
+            include-tests: 'true'
+            include-snapshot-tests: 'true'
+
+          # .NET 10 — net10.0 generator, all test projects
+          - name: "net10 | all options | net10.0 generator"
+            dotnet-version: '10.x'
+            dotnet-quality: 'ga'
+            framework: 'net10.0'
+            generator-framework: 'net10.0'
+            include-tests: 'true'
+            include-snapshot-tests: 'true'
+
+          # .NET 10 — default generator framework (netstandard2.0), all test projects
+          - name: "net10 | all options | netstandard2.0 generator"
+            dotnet-version: '10.x'
+            dotnet-quality: 'ga'
+            framework: 'net10.0'
+            generator-framework: 'netstandard2.0'
+            include-tests: 'true'
+            include-snapshot-tests: 'true'
+
+          # .NET 9 — generator only (no test projects)
+          - name: "net9 | generator only"
+            dotnet-version: '9.x'
+            dotnet-quality: 'ga'
+            framework: 'net9.0'
+            generator-framework: 'netstandard2.0'
+            include-tests: 'false'
+            include-snapshot-tests: 'false'
+
+          # .NET 9 — unit tests only (no snapshot tests)
+          - name: "net9 | unit tests only"
+            dotnet-version: '9.x'
+            dotnet-quality: 'ga'
+            framework: 'net9.0'
+            generator-framework: 'netstandard2.0'
+            include-tests: 'true'
+            include-snapshot-tests: 'false'
+
+          # .NET 9 — snapshot tests only (no unit tests)
+          - name: "net9 | snapshot tests only"
+            dotnet-version: '9.x'
+            dotnet-quality: 'ga'
+            framework: 'net9.0'
+            generator-framework: 'netstandard2.0'
+            include-tests: 'false'
+            include-snapshot-tests: 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-quality: ${{ matrix.dotnet-quality }}
+
+      - name: Install template from local source
+        run: dotnet new install ./templates/SourceGeneratorTemplate/
+
+      - name: Generate project from template
+        working-directory: /tmp
+        run: |
+          dotnet new sourcegen \
+            --name TestGenerator \
+            --Framework "${{ matrix.framework }}" \
+            --GeneratorFramework "${{ matrix.generator-framework }}" \
+            --IncludeTests ${{ matrix.include-tests }} \
+            --IncludeSnapshotTests ${{ matrix.include-snapshot-tests }}
+
+      - name: Verify generated file structure
+        shell: bash
+        run: |
+          BASE="/tmp/TestGenerator"
+          EXIT_CODE=0
+
+          check_file() {
+            if [ ! -f "$1" ]; then
+              echo "::error::Missing expected file: $1"
+              EXIT_CODE=1
+            else
+              echo "✓ Found: $1"
+            fi
+          }
+
+          check_absent() {
+            if [ -e "$1" ]; then
+              echo "::error::Unexpected path (should not exist): $1"
+              EXIT_CODE=1
+            else
+              echo "✓ Correctly absent: $1"
+            fi
+          }
+
+          # Generator project
+          check_file "$BASE/TestGenerator/TestGenerator.csproj"
+          check_file "$BASE/TestGenerator/TestGeneratorImpl.cs"
+
+          # Solution and README
+          check_file "$BASE/TestGenerator.slnx"
+          check_file "$BASE/README.md"
+
+          # Unit test project
+          if [ "${{ matrix.include-tests }}" = "true" ]; then
+            check_file "$BASE/TestGenerator.Tests/TestGenerator.Tests.csproj"
+            check_file "$BASE/TestGenerator.Tests/TestGeneratorTests.cs"
+            check_file "$BASE/TestGenerator.Tests/TestHelper.cs"
+            check_file "$BASE/TestGenerator.Tests/GlobalUsings.cs"
+          else
+            check_absent "$BASE/TestGenerator.Tests"
+          fi
+
+          # Snapshot test project
+          if [ "${{ matrix.include-snapshot-tests }}" = "true" ]; then
+            check_file "$BASE/TestGenerator.SnapshotTests/TestGenerator.SnapshotTests.csproj"
+            check_file "$BASE/TestGenerator.SnapshotTests/TestGeneratorSnapshotTests.cs"
+            check_file "$BASE/TestGenerator.SnapshotTests/TestHelper.cs"
+            check_file "$BASE/TestGenerator.SnapshotTests/GlobalUsings.cs"
+          else
+            check_absent "$BASE/TestGenerator.SnapshotTests"
+          fi
+
+          exit $EXIT_CODE
+
+      - name: Build generated project
+        working-directory: /tmp/TestGenerator
+        run: dotnet build TestGenerator.slnx --configuration Release
+
+      - name: Run unit tests
+        if: matrix.include-tests == 'true'
+        working-directory: /tmp/TestGenerator
+        run: dotnet test TestGenerator.Tests/ --configuration Release --no-build --verbosity normal
+
+      - name: Run snapshot tests
+        if: matrix.include-snapshot-tests == 'true'
+        working-directory: /tmp/TestGenerator
+        run: dotnet test TestGenerator.SnapshotTests/ --configuration Release --no-build --verbosity normal
