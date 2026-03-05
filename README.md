@@ -76,9 +76,36 @@ MyGenerator/
 dotnet new uninstall CNinnovation.SourceGenerator.Template
 ```
 
+## CI / Integration Tests
+
+Automated integration tests run via GitHub Actions on every push or pull request that changes files under `templates/SourceGeneratorTemplate/`. They can also be triggered manually from the **Actions** tab.
+
+### What is tested
+
+The workflow (`integration-tests-source-generator.yml`) exercises the following combinations:
+
+| Job | .NET SDK | `--Framework` | `--GeneratorFramework` | `--IncludeTests` | `--IncludeSnapshotTests` |
+|-----|----------|--------------|------------------------|-----------------|-------------------------|
+| net9 \| all options \| netstandard2.0 generator | 9.x | net9.0 | netstandard2.0 | true | true |
+| net9 \| all options \| net9.0 generator | 9.x | net9.0 | net9.0 | true | true |
+| net10 \| all options \| netstandard2.0 generator | 10.x (preview) | net10.0 | netstandard2.0 | true | true |
+| net9 \| generator only | 9.x | net9.0 | netstandard2.0 | false | false |
+| net9 \| unit tests only | 9.x | net9.0 | netstandard2.0 | true | false |
+| net9 \| snapshot tests only | 9.x | net9.0 | netstandard2.0 | false | true |
+
+### Each job performs
+
+1. **Install** – installs the template from the local repository source.
+2. **Generate** – runs `dotnet new sourcegen` with the matrix parameters.
+3. **Verify** – checks that all expected files and directories are present (and absent ones do not exist).
+4. **Build** – compiles the generated solution with `dotnet build --configuration Release`.
+5. **Test** – runs any included test projects with `dotnet test --configuration Release --no-build`.
+
+Build or test failures are reported with full output so failures can be diagnosed quickly.
+
 ## Requirements
 
-- .NET 8 SDK or later
+- .NET 9 SDK or later (or .NET 10 preview for `net10.0` targets)
 - Visual Studio 2022 17.7 or later (recommended for out-of-process source generator development experience)
 - C# 12.0 or later
 
