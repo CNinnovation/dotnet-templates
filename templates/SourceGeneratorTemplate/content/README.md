@@ -35,7 +35,7 @@ dotnet new uninstall CNinnovation.Templates.SourceGenerator
 
 ```
 AwesomeGenerator/
-├── AwesomeGenerator/                   # Source generator (net8.0)
+├── AwesomeGenerator/                   # Source generator (netstandard2.0 by default)
 │   ├── AwesomeGenerator.csproj
 │   └── AwesomeGeneratorImpl.cs         # IIncrementalGenerator implementation
 │
@@ -172,5 +172,5 @@ same as in xUnit v2.
 
 ## Requirements
 
-- **.NET 9.0** or later
+- **.NET 9.0** or later SDK
 - **C# 13** (LangVersion `latest` is set automatically)

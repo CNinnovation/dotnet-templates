@@ -8,10 +8,10 @@ A comprehensive template for creating C# source generators with built-in testing
 
 ### Features
 
-- **Source Generator Project** - Pre-configured Roslyn incremental source generator with `netstandard2.0` targeting
+- **Source Generator Project** - Pre-configured Roslyn incremental source generator with configurable target framework (`netstandard2.0` by default)
 - **xUnit v3 Test Project** - Modern testing infrastructure with the latest xUnit version
 - **Snapshot Testing** - Integrated Verify framework for snapshot-based testing
-- **Flexible Configuration** - Choose your target framework (.NET 9 or .NET 10)
+- **Flexible Configuration** - Choose your target framework (.NET Standard 2.0, .NET 8, .NET 9, or .NET 10)
 - **Optional Components** - Include/exclude unit tests and snapshot tests as needed
 - **Sample Code** - Working example to get started immediately
 
@@ -40,15 +40,19 @@ dotnet new sourcegen -n MyGenerator
 **Options:**
 
 - `-n|--name` - Name of the source generator (default: `MyGenerator`)
-- `--Framework` - Target framework: `net9.0` or `net10.0` (default: `net10.0`)
+- `--GeneratorFramework` - Target framework for the source generator project: `netstandard2.0`, `net8.0`, `net9.0`, or `net10.0` (default: `netstandard2.0`)
+- `--Framework` - Target framework for the test projects: `net9.0` or `net10.0` (default: `net10.0`)
 - `--IncludeTests` - Include unit test project (default: `true`)
 - `--IncludeSnapshotTests` - Include snapshot test project (default: `true`)
 
 **Examples:**
 
 ```bash
-# Create with .NET 9 target framework
-dotnet new sourcegen -n MyGenerator --Framework net9.0
+# Create with .NET Standard 2.0 generator (supports .NET Framework consumers)
+dotnet new sourcegen -n MyGenerator --GeneratorFramework netstandard2.0
+
+# Create with .NET 9 generator and .NET 9 test framework
+dotnet new sourcegen -n MyGenerator --GeneratorFramework net9.0 --Framework net9.0
 
 # Create without snapshot tests
 dotnet new sourcegen -n MyGenerator --IncludeSnapshotTests false
