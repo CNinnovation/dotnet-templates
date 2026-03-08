@@ -119,11 +119,15 @@ Contributions are welcome! Before you submit a Pull Request, create an issue to 
 
 This project is licensed under the MIT License.
 
+Third party notices and attributions can be found in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
 ## Author
 
 **CN innovation**
 - GitHub: [https://github.com/CNinnovation](https://github.com/CNinnovation)
 - Project: [https://github.com/CNinnovation/dotnet-templates](https://github.com/CNinnovation/dotnet-templates)
+- CN innovation: [https://cninnovation.com](https://cninnovation.com)
+- Christian Nagel's blog: [https://csharp.christiannagel.com](https://csharp.christiannagel.com)
 
 ## Resources
 

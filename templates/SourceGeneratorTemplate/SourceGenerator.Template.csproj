@@ -29,6 +29,7 @@
 
     <!-- Include README for NuGet package -->
     <None Include="content\README.md" Pack="true" PackagePath="\" />
+    <None Include="content\THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="\" />
 
     <!-- Exclude all code files from compilation -->
     <Compile Remove="**\*" />

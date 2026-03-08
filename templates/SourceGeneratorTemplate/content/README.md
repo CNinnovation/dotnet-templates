@@ -193,3 +193,28 @@ same as in xUnit v2.
 
 - **.NET SDK matching the selected test TFM** (for example, `net9.0` or `net10.0`)
 - **C# 13** (LangVersion `latest` is set automatically)
+
+---
+
+## Third-Party Dependencies
+
+This template uses the following NuGet packages:
+
+### Source Generator
+- **Microsoft.CodeAnalysis.CSharp** (5.0.0) – Roslyn C# compiler API
+- **Microsoft.CodeAnalysis.Analyzers** (4.14.0) – Analyzer development tools
+
+### Test Projects
+- **xUnit v3** (3.2.2) – Unit testing framework
+- **Microsoft.NET.Test.Sdk** (18.3.0) – Test platform
+- **xunit.runner.visualstudio** (3.1.5) – Visual Studio test runner
+- **coverlet.collector** (8.0.0) – Code coverage collector
+
+### Snapshot Testing
+- **Verify.XunitV3** (31.13.2) – Snapshot testing library
+- **Verify.SourceGenerators** (2.5.0) – Source generator snapshot extensions
+
+For complete license information and attribution, see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+All dependencies use permissive open-source licenses (MIT or Apache-2.0).
+
