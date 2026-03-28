@@ -34,7 +34,7 @@ dotnet new install ./templates/SourceGeneratorTemplate
 Create a new source generator project with all features:
 
 ```bash
-dotnet new sourcegen -n MyGenerator
+dotnet new cni-sourcegen -n MyGenerator
 ```
 
 **Options:**
@@ -49,16 +49,16 @@ dotnet new sourcegen -n MyGenerator
 
 ```bash
 # Create with .NET Standard 2.0 generator (supports .NET Framework consumers)
-dotnet new sourcegen -n MyGenerator --GeneratorFramework netstandard2.0
+dotnet new cni-sourcegen -n MyGenerator --GeneratorFramework netstandard2.0
 
 # Create with .NET 9 generator and .NET 9 test framework
-dotnet new sourcegen -n MyGenerator --GeneratorFramework net9.0 --Framework net9.0
+dotnet new cni-sourcegen -n MyGenerator --GeneratorFramework net9.0 --Framework net9.0
 
 # Create without snapshot tests
-dotnet new sourcegen -n MyGenerator --IncludeSnapshotTests false
+dotnet new cni-sourcegen -n MyGenerator --IncludeSnapshotTests false
 
 # Create only the generator (no tests)
-dotnet new sourcegen -n MyGenerator --IncludeTests false --IncludeSnapshotTests false
+dotnet new cni-sourcegen -n MyGenerator --IncludeTests false --IncludeSnapshotTests false
 ```
 
 ### Generated Structure
@@ -98,7 +98,7 @@ The workflow (`integration-tests-source-generator.yml`) exercises the following 
 ### Each job performs
 
 1. **Install** – installs the template from the local repository source.
-2. **Generate** – runs `dotnet new sourcegen` with the matrix parameters.
+2. **Generate** – runs `dotnet new cni-sourcegen` with the matrix parameters.
 3. **Verify** – checks that all expected files and directories are present (and absent ones do not exist).
 4. **Build** – compiles the generated solution with `dotnet build --configuration Release`.
 5. **Test** – runs any included test projects with `dotnet test --configuration Release --no-build`.
