@@ -138,7 +138,7 @@ jobs:
           if [ -n "$SYNTAX_MODE" ]; then
             EXTRA_ARGS+=(--SyntaxProviderMode "$SYNTAX_MODE")
           fi
-          dotnet new sourcegen \
+          dotnet new cni-sourcegen \
             --name TestGenerator \
             --Framework "${{ matrix.framework }}" \
             --GeneratorFramework "${{ matrix.generator-framework }}" \
