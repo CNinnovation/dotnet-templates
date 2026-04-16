@@ -107,7 +107,7 @@ Build or test failures are reported with full output so failures can be diagnose
 
 ## Requirements
 
-- .NET 9 SDK or later (or .NET 10 preview for `net10.0` targets)
+- .NET 9 SDK or later (or .NET 10 for `net10.0` targets)
 - Visual Studio 2022 17.7 or later (recommended for out-of-process source generator development experience)
 - C# 12.0 or later
 
