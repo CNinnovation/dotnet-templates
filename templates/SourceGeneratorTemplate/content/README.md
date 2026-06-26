@@ -19,7 +19,7 @@ dotnet new install CNinnovation.Templates.SourceGenerator
 Scaffold a new generator solution:
 
 ```bash
-dotnet new sourcegen -n AwesomeGenerator
+dotnet new cni-sourcegen -n AwesomeGenerator
 cd AwesomeGenerator
 ```
 
@@ -118,7 +118,7 @@ Replace `GenerateInfoAttribute` and the corresponding generation logic in
 
 ```bash
 # scaffold with the optimized attribute-based approach
-dotnet new sourcegen -n AwesomeGenerator -m ForAttributeWithMetadataName
+dotnet new cni-sourcegen -n AwesomeGenerator -m ForAttributeWithMetadataName
 ```
 
 ---
