@@ -7,14 +7,14 @@ This project uses the following third-party packages and dependencies:
 ## Source Generator Project
 
 ### Microsoft.CodeAnalysis.Analyzers
-- **Version:** 4.14.0
+- **Version:** 5.3.0
 - **License:** MIT
 - **Copyright:** .NET Foundation and Contributors
 - **Repository:** https://github.com/dotnet/roslyn
 - **Purpose:** Provides analyzers for developing Roslyn analyzers and source generators
 
 ### Microsoft.CodeAnalysis.CSharp
-- **Version:** 5.0.0
+- **Version:** 5.3.0
 - **License:** MIT
 - **Copyright:** .NET Foundation and Contributors
 - **Repository:** https://github.com/dotnet/roslyn
@@ -25,7 +25,7 @@ This project uses the following third-party packages and dependencies:
 ## Test Projects
 
 ### Microsoft.NET.Test.Sdk
-- **Version:** 18.3.0
+- **Version:** 18.7.0
 - **License:** MIT
 - **Copyright:** Microsoft Corporation
 - **Repository:** https://github.com/microsoft/vstest
@@ -46,7 +46,7 @@ This project uses the following third-party packages and dependencies:
 - **Purpose:** Visual Studio test runner for xUnit
 
 ### coverlet.collector
-- **Version:** 8.0.0
+- **Version:** 10.0.1
 - **License:** MIT
 - **Copyright:** tonerdo and Contributors
 - **Repository:** https://github.com/coverlet-coverage/coverlet
