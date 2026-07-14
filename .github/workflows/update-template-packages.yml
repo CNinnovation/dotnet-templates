@@ -71,7 +71,7 @@ jobs:
             fi
 
             echo "Checking for outdated packages in: $CSPROJ"
-            OUTPUT=$(dotnet list "$CSPROJ" package --outdated --format json 2>/dev/null || echo "{}")
+            OUTPUT=$(dotnet package list --project "$CSPROJ" --outdated --format json)
 
             jq -r '
               .projects[]?.frameworks[]?.topLevelPackages[]? |
@@ -81,7 +81,7 @@ jobs:
                 .latestVersion != .requestedVersion
               ) |
               "\(.id)\t\(.requestedVersion)\t\(.latestVersion)"
-            ' <<< "$OUTPUT" 2>/dev/null >> "$UPDATES_FILE" || true
+            ' <<< "$OUTPUT" >> "$UPDATES_FILE"
           done
 
           # Remove duplicate lines (same package may appear in multiple projects)
@@ -106,8 +106,8 @@ jobs:
             # Update template csproj files
             for TEMPLATE_FILE in "${TEMPLATE_FILES[@]}"; do
               if grep -qF "\"$PACKAGE_ID\" Version=\"$CURRENT_VERSION\"" "$TEMPLATE_FILE"; then
-                sed -i \
-                  "s|\"$PACKAGE_ID\" Version=\"$CURRENT_VERSION\"|\"$PACKAGE_ID\" Version=\"$LATEST_VERSION\"|g" \
+                perl -i -pe \
+                  "s/\\Q\"$PACKAGE_ID\" Version=\"$CURRENT_VERSION\"\\E/\"$PACKAGE_ID\" Version=\"$LATEST_VERSION\"/g" \
                   "$TEMPLATE_FILE"
                 echo "  Updated $TEMPLATE_FILE"
                 CHANGED=true
@@ -118,16 +118,16 @@ jobs:
             # Most package names match their NuGet ID directly; handle the
             # xunit.v3 → "xUnit v3" display-name exception separately.
             if grep -qF "**$PACKAGE_ID** ($CURRENT_VERSION)" "$TEMPLATE_README"; then
-              sed -i \
-                "s|\*\*$PACKAGE_ID\*\* ($CURRENT_VERSION)|\*\*$PACKAGE_ID\*\* ($LATEST_VERSION)|g" \
+              perl -i -pe \
+                "s/\\Q**$PACKAGE_ID** ($CURRENT_VERSION)\\E/**$PACKAGE_ID** ($LATEST_VERSION)/g" \
                 "$TEMPLATE_README"
               echo "  Updated README display name for $PACKAGE_ID"
               CHANGED=true
             fi
             if [ "$PACKAGE_ID" = "xunit.v3" ] && \
                grep -qF "**xUnit v3** ($CURRENT_VERSION)" "$TEMPLATE_README"; then
-              sed -i \
-                "s|\*\*xUnit v3\*\* ($CURRENT_VERSION)|\*\*xUnit v3\*\* ($LATEST_VERSION)|g" \
+              perl -i -pe \
+                "s/\\Q**xUnit v3** ($CURRENT_VERSION)\\E/**xUnit v3** ($LATEST_VERSION)/g" \
                 "$TEMPLATE_README"
               echo "  Updated README display name for xUnit v3"
               CHANGED=true
