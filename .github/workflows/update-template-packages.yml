@@ -1,0 +1,177 @@
+name: Update Template NuGet Packages
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Mondays at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-packages:
+    name: Detect and update outdated NuGet packages in templates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '9.x'
+          dotnet-quality: 'ga'
+
+      - name: Install template from local source
+        run: dotnet new install ./templates/SourceGeneratorTemplate/
+
+      - name: Generate project from template
+        working-directory: /tmp
+        run: |
+          dotnet new cni-sourcegen \
+            --name TestGenerator \
+            --Framework net9.0 \
+            --GeneratorFramework netstandard2.0 \
+            --IncludeTests true \
+            --IncludeSnapshotTests true
+
+      - name: Restore generated solution
+        working-directory: /tmp/TestGenerator
+        run: dotnet restore TestGenerator.slnx
+
+      - name: Detect and apply outdated package updates
+        id: detect_updates
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TEMPLATE_FILES=(
+            "templates/SourceGeneratorTemplate/content/MyGenerator/MyGenerator.csproj"
+            "templates/SourceGeneratorTemplate/content/MyGenerator.Tests/MyGenerator.Tests.csproj"
+            "templates/SourceGeneratorTemplate/content/MyGenerator.SnapshotTests/MyGenerator.SnapshotTests.csproj"
+          )
+          TEMPLATE_README="templates/SourceGeneratorTemplate/content/README.md"
+
+          GENERATED_PROJECTS=(
+            "/tmp/TestGenerator/TestGenerator/TestGenerator.csproj"
+            "/tmp/TestGenerator/TestGenerator.Tests/TestGenerator.Tests.csproj"
+            "/tmp/TestGenerator/TestGenerator.SnapshotTests/TestGenerator.SnapshotTests.csproj"
+          )
+
+          # Collect all outdated packages across generated projects into a temp file.
+          # Each line: "<package-id>\t<requested-version>\t<latest-version>"
+          UPDATES_FILE=$(mktemp)
+
+          for CSPROJ in "${GENERATED_PROJECTS[@]}"; do
+            if [ ! -f "$CSPROJ" ]; then
+              echo "Skipping missing project: $CSPROJ"
+              continue
+            fi
+
+            echo "Checking for outdated packages in: $CSPROJ"
+            OUTPUT=$(dotnet list "$CSPROJ" package --outdated --format json 2>/dev/null || echo "{}")
+
+            jq -r '
+              .projects[]?.frameworks[]?.topLevelPackages[]? |
+              select(
+                .latestVersion != null and
+                .latestVersion != "" and
+                .latestVersion != .requestedVersion
+              ) |
+              "\(.id)\t\(.requestedVersion)\t\(.latestVersion)"
+            ' <<< "$OUTPUT" 2>/dev/null >> "$UPDATES_FILE" || true
+          done
+
+          # Remove duplicate lines (same package may appear in multiple projects)
+          sort -u "$UPDATES_FILE" -o "$UPDATES_FILE"
+
+          if [ ! -s "$UPDATES_FILE" ]; then
+            echo "All template NuGet packages are up to date."
+            echo "has_updates=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Outdated packages detected:"
+          cat "$UPDATES_FILE"
+
+          SUMMARY_LINES=()
+
+          while IFS=$'\t' read -r PACKAGE_ID CURRENT_VERSION LATEST_VERSION; do
+            [ -z "$PACKAGE_ID" ] && continue
+            echo "Updating $PACKAGE_ID: $CURRENT_VERSION -> $LATEST_VERSION"
+            CHANGED=false
+
+            # Update template csproj files
+            for TEMPLATE_FILE in "${TEMPLATE_FILES[@]}"; do
+              if grep -qF "\"$PACKAGE_ID\" Version=\"$CURRENT_VERSION\"" "$TEMPLATE_FILE"; then
+                sed -i \
+                  "s|\"$PACKAGE_ID\" Version=\"$CURRENT_VERSION\"|\"$PACKAGE_ID\" Version=\"$LATEST_VERSION\"|g" \
+                  "$TEMPLATE_FILE"
+                echo "  Updated $TEMPLATE_FILE"
+                CHANGED=true
+              fi
+            done
+
+            # Update version references in the template README.
+            # Most package names match their NuGet ID directly; handle the
+            # xunit.v3 → "xUnit v3" display-name exception separately.
+            if grep -qF "**$PACKAGE_ID** ($CURRENT_VERSION)" "$TEMPLATE_README"; then
+              sed -i \
+                "s|\*\*$PACKAGE_ID\*\* ($CURRENT_VERSION)|\*\*$PACKAGE_ID\*\* ($LATEST_VERSION)|g" \
+                "$TEMPLATE_README"
+              echo "  Updated README display name for $PACKAGE_ID"
+              CHANGED=true
+            fi
+            if [ "$PACKAGE_ID" = "xunit.v3" ] && \
+               grep -qF "**xUnit v3** ($CURRENT_VERSION)" "$TEMPLATE_README"; then
+              sed -i \
+                "s|\*\*xUnit v3\*\* ($CURRENT_VERSION)|\*\*xUnit v3\*\* ($LATEST_VERSION)|g" \
+                "$TEMPLATE_README"
+              echo "  Updated README display name for xUnit v3"
+              CHANGED=true
+            fi
+
+            if [ "$CHANGED" = "true" ]; then
+              SUMMARY_LINES+=("- **$PACKAGE_ID**: \`$CURRENT_VERSION\` → \`$LATEST_VERSION\`")
+            fi
+          done < "$UPDATES_FILE"
+
+          rm -f "$UPDATES_FILE"
+
+          if [ ${#SUMMARY_LINES[@]} -eq 0 ]; then
+            echo "No template files were modified."
+            echo "has_updates=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "has_updates=true" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "summary<<EOF"
+            for LINE in "${SUMMARY_LINES[@]}"; do
+              echo "$LINE"
+            done
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create Pull Request
+        if: steps.detect_updates.outputs.has_updates == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update NuGet packages in source generator template"
+          title: "chore: update NuGet packages in source generator template"
+          body: |
+            Automated NuGet package version updates for the source generator template.
+
+            ## Updated Packages
+
+            ${{ steps.detect_updates.outputs.summary }}
+
+            ---
+            *This PR was created automatically by the [Update Template NuGet Packages](${{ github.server_url }}/${{ github.repository }}/actions/workflows/update-template-packages.yml) workflow.*
+          branch: automated/update-template-nuget-packages
+          delete-branch: true
+          labels: dependencies
