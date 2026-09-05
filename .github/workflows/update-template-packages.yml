@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '9.x'
+          dotnet-version: '10.x'
           dotnet-quality: 'ga'
 
       - name: Install template from local source
@@ -32,7 +32,7 @@ jobs:
         run: |
           dotnet new cni-sourcegen \
             --name TestGenerator \
-            --Framework net9.0 \
+            --Framework net10.0 \
             --GeneratorFramework netstandard2.0 \
             --IncludeTests true \
             --IncludeSnapshotTests true
@@ -115,19 +115,19 @@ jobs:
             done
 
             # Update version references in the template README.
-            # Most package names match their NuGet ID directly; handle the
-            # xunit.v3 → "xUnit v3" display-name exception separately.
-            if grep -qF "**$PACKAGE_ID** ($CURRENT_VERSION)" "$TEMPLATE_README"; then
+            # Match any existing version for the package name so stale README entries
+            # still get updated, even if the current version is already out of sync.
+            if grep -qF "**$PACKAGE_ID** (" "$TEMPLATE_README"; then
               perl -i -pe \
-                "s/\\Q**$PACKAGE_ID** ($CURRENT_VERSION)\\E/**$PACKAGE_ID** ($LATEST_VERSION)/g" \
+                "s/\\Q**$PACKAGE_ID** (\\E[^)]*\\Q)\\E/**$PACKAGE_ID** ($LATEST_VERSION)/g" \
                 "$TEMPLATE_README"
               echo "  Updated README display name for $PACKAGE_ID"
               CHANGED=true
             fi
             if [ "$PACKAGE_ID" = "xunit.v3" ] && \
-               grep -qF "**xUnit v3** ($CURRENT_VERSION)" "$TEMPLATE_README"; then
+               grep -qF "**xUnit v3** (" "$TEMPLATE_README"; then
               perl -i -pe \
-                "s/\\Q**xUnit v3** ($CURRENT_VERSION)\\E/**xUnit v3** ($LATEST_VERSION)/g" \
+                "s/\\Q**xUnit v3** (\\E[^)]*\\Q)\\E/**xUnit v3** ($LATEST_VERSION)/g" \
                 "$TEMPLATE_README"
               echo "  Updated README display name for xUnit v3"
               CHANGED=true
