@@ -63,6 +63,7 @@ jobs:
           # Collect all outdated packages across generated projects into a temp file.
           # Each line: "<package-id>\t<requested-version>\t<latest-version>"
           UPDATES_FILE=$(mktemp)
+          PACKAGE_VERSIONS_FILE=$(mktemp)
 
           for CSPROJ in "${GENERATED_PROJECTS[@]}"; do
             if [ ! -f "$CSPROJ" ]; then
@@ -72,6 +73,11 @@ jobs:
 
             echo "Checking for outdated packages in: $CSPROJ"
             OUTPUT=$(dotnet package list --project "$CSPROJ" --outdated --format json)
+
+            jq -r '
+              .projects[]?.frameworks[]?.topLevelPackages[]? |
+              "\(.id)\t\(.requestedVersion)"
+            ' <<< "$OUTPUT" >> "$PACKAGE_VERSIONS_FILE"
 
             jq -r '
               .projects[]?.frameworks[]?.topLevelPackages[]? |
@@ -86,17 +92,51 @@ jobs:
 
           # Remove duplicate lines (same package may appear in multiple projects)
           sort -u "$UPDATES_FILE" -o "$UPDATES_FILE"
+          sort -u "$PACKAGE_VERSIONS_FILE" -o "$PACKAGE_VERSIONS_FILE"
+
+          SUMMARY_LINES=()
+
+          # Synchronize README versions for all requested packages, including
+          # packages that are already up to date and therefore absent from
+          # the outdated package list.
+          while IFS=$'\t' read -r PACKAGE_ID CURRENT_VERSION; do
+            [ -z "$PACKAGE_ID" ] && continue
+            DISPLAY_NAME="$PACKAGE_ID"
+            if [ "$PACKAGE_ID" = "xunit.v3" ]; then
+              DISPLAY_NAME="xUnit v3"
+            fi
+
+            if grep -qF "**$DISPLAY_NAME** (" "$TEMPLATE_README"; then
+              BEFORE=$(sha256sum "$TEMPLATE_README")
+              perl -i -pe \
+                "s/\\Q**$DISPLAY_NAME** (\\E[^)]*\\Q)\\E/**$DISPLAY_NAME** ($CURRENT_VERSION)/g" \
+                "$TEMPLATE_README"
+              AFTER=$(sha256sum "$TEMPLATE_README")
+              if [ "$BEFORE" != "$AFTER" ]; then
+                echo "  Synchronized README version for $PACKAGE_ID"
+                SUMMARY_LINES+=("- **$PACKAGE_ID**: README synchronized to \`$CURRENT_VERSION\`")
+              fi
+            fi
+          done < "$PACKAGE_VERSIONS_FILE"
 
           if [ ! -s "$UPDATES_FILE" ]; then
-            echo "All template NuGet packages are up to date."
-            echo "has_updates=false" >> "$GITHUB_OUTPUT"
+            rm -f "$UPDATES_FILE" "$PACKAGE_VERSIONS_FILE"
+            if [ ${#SUMMARY_LINES[@]} -eq 0 ]; then
+              echo "All template NuGet packages are up to date."
+              echo "has_updates=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "has_updates=true" >> "$GITHUB_OUTPUT"
+              {
+                echo "summary<<EOF"
+                printf '%s\n' "${SUMMARY_LINES[@]}"
+                echo "EOF"
+              } >> "$GITHUB_OUTPUT"
+            fi
             exit 0
           fi
 
           echo "Outdated packages detected:"
           cat "$UPDATES_FILE"
-
-          SUMMARY_LINES=()
 
           while IFS=$'\t' read -r PACKAGE_ID CURRENT_VERSION LATEST_VERSION; do
             [ -z "$PACKAGE_ID" ] && continue
@@ -138,7 +178,7 @@ jobs:
             fi
           done < "$UPDATES_FILE"
 
-          rm -f "$UPDATES_FILE"
+          rm -f "$UPDATES_FILE" "$PACKAGE_VERSIONS_FILE"
 
           if [ ${#SUMMARY_LINES[@]} -eq 0 ]; then
             echo "No template files were modified."
