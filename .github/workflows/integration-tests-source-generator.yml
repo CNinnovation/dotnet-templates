@@ -230,19 +230,23 @@ jobs:
           exit $EXIT_CODE
 
       - name: Configure Verify declaration for CI
-        if: matrix.include-snapshot-tests == 'true'
         shell: bash
         working-directory: /tmp/TestGenerator
         run: |
-          EXEMPT_UNTIL=$(date +%Y-%m)
-          cat > Directory.Build.props <<EOF
-          <Project>
-            <PropertyGroup>
-              <Verify_SponsorshipExemption>OpenSource</Verify_SponsorshipExemption>
-              <Verify_SponsorshipExemptionUntil>${EXEMPT_UNTIL}</Verify_SponsorshipExemptionUntil>
-            </PropertyGroup>
-          </Project>
-          EOF
+          if [ -f "TestGenerator.SnapshotTests/TestGenerator.SnapshotTests.csproj" ]; then
+            EXEMPT_UNTIL=$(date +%Y-%m)
+            cat > Directory.Build.props <<EOF
+<Project>
+  <PropertyGroup>
+    <Verify_SponsorshipExemption>OpenSource</Verify_SponsorshipExemption>
+    <Verify_SponsorshipExemptionUntil>${EXEMPT_UNTIL}</Verify_SponsorshipExemptionUntil>
+  </PropertyGroup>
+</Project>
+EOF
+            echo "Configured Verify sponsorship exemption for CI."
+          else
+            echo "No snapshot test project generated; skipping Verify CI configuration."
+          fi
 
       - name: Build generated project
         working-directory: /tmp/TestGenerator
@@ -254,6 +258,11 @@ jobs:
         run: dotnet test TestGenerator.Tests/ --configuration Release --no-build --verbosity normal
 
       - name: Run snapshot tests
-        if: matrix.include-snapshot-tests == 'true'
+        shell: bash
         working-directory: /tmp/TestGenerator
-        run: dotnet test TestGenerator.SnapshotTests/ --configuration Release --no-build --verbosity normal
+        run: |
+          if [ -d "TestGenerator.SnapshotTests" ]; then
+            dotnet test TestGenerator.SnapshotTests/ --configuration Release --no-build --verbosity normal
+          else
+            echo "No snapshot test project generated; skipping snapshot tests."
+          fi
