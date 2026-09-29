@@ -3,8 +3,8 @@
 This template scaffolds a complete .NET source generator solution that includes:
 
 - **`MyGenerator/`** – The source generator project (`netstandard2.0`)
-- **`MyGenerator.Tests/`** – Unit tests using **xUnit v3**
-- **`MyGenerator.SnapshotTests/`** – Snapshot tests using **xUnit v3** + **Verify**
+- **`MyGenerator.Tests/`** – Unit tests using **xUnit v3** (`4.0.1`)
+- **`MyGenerator.SnapshotTests/`** *(optional)* – Snapshot tests using **xUnit v3** (`4.0.1`) + **Verify** (`33.1.5`)
 
 ---
 
@@ -16,10 +16,17 @@ Install the template from NuGet:
 dotnet new install CNinnovation.Templates.SourceGenerator
 ```
 
-Scaffold a new generator solution:
+Scaffold a new generator solution (snapshot tests are disabled by default):
 
 ```bash
 dotnet new cni-sourcegen -n AwesomeGenerator
+cd AwesomeGenerator
+```
+
+Scaffold with snapshot tests enabled:
+
+```bash
+dotnet new cni-sourcegen -n AwesomeGenerator --IncludeSnapshotTests true
 cd AwesomeGenerator
 ```
 
@@ -45,12 +52,14 @@ AwesomeGenerator/
 │   ├── TestHelper.cs                   # Compiles code and runs the generator
 │   └── AwesomeGeneratorTests.cs
 │
-├── AwesomeGenerator.SnapshotTests/     # xUnit v3 snapshot tests via Verify
+├── AwesomeGenerator.SnapshotTests/     # Optional: xUnit v3 snapshot tests via Verify
 │   ├── AwesomeGenerator.SnapshotTests.csproj
 │   ├── GlobalUsings.cs
 │   ├── TestHelper.cs                   # Runs generator and calls Verifier.Verify
 │   ├── AwesomeGeneratorSnapshotTests.cs
 │   └── Snapshots/                      # Verified snapshot files live here
+│
+├── Directory.Build.props.example       # Optional Verify fee-status declaration template
 │
 └── AwesomeGenerator.slnx               # Solution file
 ```
@@ -129,9 +138,24 @@ Snapshot tests use the [Verify](https://github.com/VerifyTests/Verify) library t
 with `Verify.SourceGenerators` to capture and compare the exact text of every generated
 source file.
 
+### Verify Sponsorship / Exemption Setup (Required)
+
+Verify v33+ requires one fee-status declaration during build. The template does **not**
+set this for you.
+
+1. Copy `Directory.Build.props.example` to `Directory.Build.props` at the solution root.
+2. Choose exactly one declaration option in that file (sponsor account, exemption, or
+   licensed-until) and provide valid values.
+3. Keep time-bounded fields (for example `Verify_SponsorshipExemptionUntil`) current.
+
+For policy and declaration details, see the official Verify documentation:
+https://github.com/VerifyTests/Verify/blob/main/docs/maintenance-fee.md
+
 ### Running the Bundled Snapshot Tests
 
-The template ships with two pre-accepted `.verified.txt` files in `MyGenerator.SnapshotTests/Snapshots/`, so the included snapshot tests **pass immediately** without any extra setup.
+After configuring Verify declaration properties, the included snapshot tests run normally.
+The template ships with two pre-accepted `.verified.txt` files in
+`MyGenerator.SnapshotTests/Snapshots/`.
 
 ### First Run for New Tests
 
@@ -201,17 +225,17 @@ same as in xUnit v2.
 This template uses the following NuGet packages:
 
 ### Source Generator
-- **Microsoft.CodeAnalysis.CSharp** (5.3.0) – Roslyn C# compiler API
-- **Microsoft.CodeAnalysis.Analyzers** (5.3.0) – Analyzer development tools
+- **Microsoft.CodeAnalysis.CSharp** (5.9.0) – Roslyn C# compiler API
+- **Microsoft.CodeAnalysis.Analyzers** (5.9.0) – Analyzer development tools
 
 ### Test Projects
-- **xUnit v3** (3.2.2) – Unit testing framework
-- **Microsoft.NET.Test.Sdk** (18.7.0) – Test platform
-- **xunit.runner.visualstudio** (3.1.5) – Visual Studio test runner
-- **coverlet.collector** (10.0.1) – Code coverage collector
+- **xUnit v3** (4.0.1) – Unit testing framework
+- **Microsoft.NET.Test.Sdk** (18.10.1) – Test platform
+- **xunit.runner.visualstudio** (4.0.0) – Visual Studio test runner
+- **coverlet.collector** (10.1.0) – Code coverage collector
 
 ### Snapshot Testing
-- **Verify.XunitV3** (31.13.2) – Snapshot testing library
+- **Verify.XunitV3** (33.1.5) – Snapshot testing library
 - **Verify.SourceGenerators** (2.5.0) – Source generator snapshot extensions
 
 For complete license information and attribution, see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

@@ -70,6 +70,13 @@ jobs:
             include-tests: 'true'
             include-snapshot-tests: 'true'
 
+          # .NET 9 — defaults for optional test toggles (snapshot tests should be off)
+          - name: "net9 | default test toggles"
+            dotnet-version: '9.x'
+            dotnet-quality: 'ga'
+            framework: 'net9.0'
+            generator-framework: 'netstandard2.0'
+
           # .NET 9 — generator only (no test projects)
           - name: "net9 | generator only"
             dotnet-version: '9.x'
@@ -134,16 +141,26 @@ jobs:
         working-directory: /tmp
         run: |
           SYNTAX_MODE="${{ matrix.syntax-provider-mode }}"
+          INCLUDE_TESTS="${{ matrix.include-tests }}"
+          INCLUDE_SNAPSHOT_TESTS="${{ matrix.include-snapshot-tests }}"
           EXTRA_ARGS=()
+
           if [ -n "$SYNTAX_MODE" ]; then
             EXTRA_ARGS+=(--SyntaxProviderMode "$SYNTAX_MODE")
           fi
+
+          if [ -n "$INCLUDE_TESTS" ]; then
+            EXTRA_ARGS+=(--IncludeTests "$INCLUDE_TESTS")
+          fi
+
+          if [ -n "$INCLUDE_SNAPSHOT_TESTS" ]; then
+            EXTRA_ARGS+=(--IncludeSnapshotTests "$INCLUDE_SNAPSHOT_TESTS")
+          fi
+
           dotnet new cni-sourcegen \
             --name TestGenerator \
             --Framework "${{ matrix.framework }}" \
             --GeneratorFramework "${{ matrix.generator-framework }}" \
-            --IncludeTests ${{ matrix.include-tests }} \
-            --IncludeSnapshotTests ${{ matrix.include-snapshot-tests }} \
             "${EXTRA_ARGS[@]}"
 
       - name: Verify generated file structure
@@ -178,8 +195,18 @@ jobs:
           check_file "$BASE/TestGenerator.slnx"
           check_file "$BASE/README.md"
 
+          INCLUDE_TESTS="${{ matrix.include-tests }}"
+          if [ -z "$INCLUDE_TESTS" ]; then
+            INCLUDE_TESTS="true"
+          fi
+
+          INCLUDE_SNAPSHOT_TESTS="${{ matrix.include-snapshot-tests }}"
+          if [ -z "$INCLUDE_SNAPSHOT_TESTS" ]; then
+            INCLUDE_SNAPSHOT_TESTS="false"
+          fi
+
           # Unit test project
-          if [ "${{ matrix.include-tests }}" = "true" ]; then
+          if [ "$INCLUDE_TESTS" = "true" ]; then
             check_file "$BASE/TestGenerator.Tests/TestGenerator.Tests.csproj"
             check_file "$BASE/TestGenerator.Tests/TestGeneratorTests.cs"
             check_file "$BASE/TestGenerator.Tests/TestHelper.cs"
@@ -188,17 +215,38 @@ jobs:
             check_absent "$BASE/TestGenerator.Tests"
           fi
 
-          # Snapshot test project
-          if [ "${{ matrix.include-snapshot-tests }}" = "true" ]; then
+          # Snapshot test project and Verify setup example
+          if [ "$INCLUDE_SNAPSHOT_TESTS" = "true" ]; then
             check_file "$BASE/TestGenerator.SnapshotTests/TestGenerator.SnapshotTests.csproj"
             check_file "$BASE/TestGenerator.SnapshotTests/TestGeneratorSnapshotTests.cs"
             check_file "$BASE/TestGenerator.SnapshotTests/TestHelper.cs"
             check_file "$BASE/TestGenerator.SnapshotTests/GlobalUsings.cs"
+            check_file "$BASE/Directory.Build.props.example"
           else
             check_absent "$BASE/TestGenerator.SnapshotTests"
+            check_absent "$BASE/Directory.Build.props.example"
           fi
 
           exit $EXIT_CODE
+
+      - name: Configure Verify declaration for CI
+        shell: bash
+        working-directory: /tmp/TestGenerator
+        run: |
+          if [ -f "TestGenerator.SnapshotTests/TestGenerator.SnapshotTests.csproj" ]; then
+            EXEMPT_UNTIL=$(date +%Y-%m)
+            cat > Directory.Build.props <<EOF
+<Project>
+  <PropertyGroup>
+    <Verify_SponsorshipExemption>OpenSource</Verify_SponsorshipExemption>
+    <Verify_SponsorshipExemptionUntil>${EXEMPT_UNTIL}</Verify_SponsorshipExemptionUntil>
+  </PropertyGroup>
+</Project>
+EOF
+            echo "Configured Verify sponsorship exemption for CI."
+          else
+            echo "No snapshot test project generated; skipping Verify CI configuration."
+          fi
 
       - name: Build generated project
         working-directory: /tmp/TestGenerator
@@ -210,6 +258,11 @@ jobs:
         run: dotnet test TestGenerator.Tests/ --configuration Release --no-build --verbosity normal
 
       - name: Run snapshot tests
-        if: matrix.include-snapshot-tests == 'true'
+        shell: bash
         working-directory: /tmp/TestGenerator
-        run: dotnet test TestGenerator.SnapshotTests/ --configuration Release --no-build --verbosity normal
+        run: |
+          if [ -d "TestGenerator.SnapshotTests" ]; then
+            dotnet test TestGenerator.SnapshotTests/ --configuration Release --no-build --verbosity normal
+          else
+            echo "No snapshot test project generated; skipping snapshot tests."
+          fi

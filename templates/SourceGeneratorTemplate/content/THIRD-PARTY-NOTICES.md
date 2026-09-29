@@ -7,14 +7,14 @@ This project uses the following third-party packages and dependencies:
 ## Source Generator Project
 
 ### Microsoft.CodeAnalysis.Analyzers
-- **Version:** 5.3.0
+- **Version:** 5.9.0
 - **License:** MIT
 - **Copyright:** .NET Foundation and Contributors
 - **Repository:** https://github.com/dotnet/roslyn
 - **Purpose:** Provides analyzers for developing Roslyn analyzers and source generators
 
 ### Microsoft.CodeAnalysis.CSharp
-- **Version:** 5.3.0
+- **Version:** 5.9.0
 - **License:** MIT
 - **Copyright:** .NET Foundation and Contributors
 - **Repository:** https://github.com/dotnet/roslyn
@@ -25,28 +25,28 @@ This project uses the following third-party packages and dependencies:
 ## Test Projects
 
 ### Microsoft.NET.Test.Sdk
-- **Version:** 18.7.0
+- **Version:** 18.10.1
 - **License:** MIT
 - **Copyright:** Microsoft Corporation
 - **Repository:** https://github.com/microsoft/vstest
 - **Purpose:** Test platform for running unit tests
 
 ### xunit.v3
-- **Version:** 3.2.2
+- **Version:** 4.0.1
 - **License:** Apache-2.0
 - **Copyright:** .NET Foundation and Contributors
 - **Repository:** https://github.com/xunit/xunit
 - **Purpose:** Unit testing framework for .NET
 
 ### xunit.runner.visualstudio
-- **Version:** 3.1.5
+- **Version:** 4.0.0
 - **License:** Apache-2.0
 - **Copyright:** .NET Foundation and Contributors
 - **Repository:** https://github.com/xunit/visualstudio.xunit
 - **Purpose:** Visual Studio test runner for xUnit
 
 ### coverlet.collector
-- **Version:** 10.0.1
+- **Version:** 10.1.0
 - **License:** MIT
 - **Copyright:** tonerdo and Contributors
 - **Repository:** https://github.com/coverlet-coverage/coverlet
@@ -57,7 +57,7 @@ This project uses the following third-party packages and dependencies:
 ## Snapshot Test Project (Additional)
 
 ### Verify.XunitV3
-- **Version:** 31.13.2
+- **Version:** 33.1.5
 - **License:** MIT
 - **Copyright:** Simon Cropp
 - **Repository:** https://github.com/VerifyTests/Verify

@@ -77,7 +77,7 @@
         "IncludeSnapshotTests": {
             "type": "parameter",
             "datatype": "bool",
-            "defaultValue": "true",
+            "defaultValue": "false",
             "description": "Include snapshot test project",
             "shortName": "s"
         },
@@ -112,7 +112,10 @@
                 },
                 {
                     "condition": "(!IncludeSnapshotTests)",
-                    "exclude": [ "MyGenerator.SnapshotTests/**/*" ]
+                    "exclude": [
+                        "MyGenerator.SnapshotTests/**/*",
+                        "Directory.Build.props.example"
+                    ]
                 }
             ]
         }
