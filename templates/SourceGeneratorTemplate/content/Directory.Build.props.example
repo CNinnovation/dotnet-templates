@@ -8,7 +8,7 @@
     <!-- Option A: Sponsoring account -->
     <!-- <Verify_GitHubSponsorAccount>your-github-account</Verify_GitHubSponsorAccount> -->
 
-    <!-- Option B: Exemption claim (requires a monthly renewal window) -->
+    <!-- Option B: Time-bounded exemption claim (up to 12 months) -->
     <!-- <Verify_SponsorshipExemption>OpenSource</Verify_SponsorshipExemption> -->
     <!-- <Verify_SponsorshipExemptionUntil>yyyy-MM</Verify_SponsorshipExemptionUntil> -->
 

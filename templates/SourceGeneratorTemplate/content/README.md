@@ -143,7 +143,7 @@ source file.
 Verify v33+ requires one fee-status declaration during build. The template does **not**
 set this for you.
 
-1. Copy `Directory.Build.props.example` to `Directory.Build.props` at the solution root.
+ 1. If snapshot tests were included, copy `Directory.Build.props.example` to `Directory.Build.props` at the solution root.
 2. Choose exactly one declaration option in that file (sponsor account, exemption, or
    licensed-until) and provide valid values.
 3. Keep time-bounded fields (for example `Verify_SponsorshipExemptionUntil`) current.
