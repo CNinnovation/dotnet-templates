@@ -3,8 +3,8 @@
 This template scaffolds a complete .NET source generator solution that includes:
 
 - **`MyGenerator/`** – The source generator project (`netstandard2.0`)
-- **`MyGenerator.Tests/`** – Unit tests using **xUnit v3**
-- **`MyGenerator.SnapshotTests/`** – Snapshot tests using **xUnit v3** + **Verify**
+- **`MyGenerator.Tests/`** – Unit tests using **xUnit v3** (`4.0.1`)
+- **`MyGenerator.SnapshotTests/`** – Snapshot tests using **xUnit v3** (`4.0.1`) + **Verify** (`33.1.5`)
 
 ---
 
@@ -201,17 +201,17 @@ same as in xUnit v2.
 This template uses the following NuGet packages:
 
 ### Source Generator
-- **Microsoft.CodeAnalysis.CSharp** (5.3.0) – Roslyn C# compiler API
-- **Microsoft.CodeAnalysis.Analyzers** (5.3.0) – Analyzer development tools
+- **Microsoft.CodeAnalysis.CSharp** (5.9.0) – Roslyn C# compiler API
+- **Microsoft.CodeAnalysis.Analyzers** (5.9.0) – Analyzer development tools
 
 ### Test Projects
-- **xUnit v3** (3.2.2) – Unit testing framework
-- **Microsoft.NET.Test.Sdk** (18.7.0) – Test platform
-- **xunit.runner.visualstudio** (3.1.5) – Visual Studio test runner
-- **coverlet.collector** (10.0.1) – Code coverage collector
+- **xUnit v3** (4.0.1) – Unit testing framework
+- **Microsoft.NET.Test.Sdk** (18.10.1) – Test platform
+- **xunit.runner.visualstudio** (4.0.0) – Visual Studio test runner
+- **coverlet.collector** (10.1.0) – Code coverage collector
 
 ### Snapshot Testing
-- **Verify.XunitV3** (31.13.2) – Snapshot testing library
+- **Verify.XunitV3** (33.1.5) – Snapshot testing library
 - **Verify.SourceGenerators** (2.5.0) – Source generator snapshot extensions
 
 For complete license information and attribution, see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
