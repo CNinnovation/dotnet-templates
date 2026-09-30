@@ -235,14 +235,7 @@ jobs:
         run: |
           if [ -f "TestGenerator.SnapshotTests/TestGenerator.SnapshotTests.csproj" ]; then
             EXEMPT_UNTIL=$(date +%Y-%m)
-            cat > Directory.Build.props <<EOF
-<Project>
-  <PropertyGroup>
-    <Verify_SponsorshipExemption>OpenSource</Verify_SponsorshipExemption>
-    <Verify_SponsorshipExemptionUntil>${EXEMPT_UNTIL}</Verify_SponsorshipExemptionUntil>
-  </PropertyGroup>
-</Project>
-EOF
+            printf '<Project>\n  <PropertyGroup>\n    <Verify_SponsorshipExemption>OpenSource</Verify_SponsorshipExemption>\n    <Verify_SponsorshipExemptionUntil>%s</Verify_SponsorshipExemptionUntil>\n  </PropertyGroup>\n</Project>\n' "$EXEMPT_UNTIL" > Directory.Build.props
             echo "Configured Verify sponsorship exemption for CI."
           else
             echo "No snapshot test project generated; skipping Verify CI configuration."
