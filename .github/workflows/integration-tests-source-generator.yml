@@ -248,14 +248,14 @@ jobs:
       - name: Run unit tests
         if: matrix.include-tests == 'true'
         working-directory: /tmp/TestGenerator
-        run: dotnet test TestGenerator.Tests/ --configuration Release --no-build --verbosity normal
+        run: dotnet run --project TestGenerator.Tests/TestGenerator.Tests.csproj --configuration Release --no-build
 
       - name: Run snapshot tests
         shell: bash
         working-directory: /tmp/TestGenerator
         run: |
           if [ -d "TestGenerator.SnapshotTests" ]; then
-            dotnet test TestGenerator.SnapshotTests/ --configuration Release --no-build --verbosity normal
+            dotnet run --project TestGenerator.SnapshotTests/TestGenerator.SnapshotTests.csproj --configuration Release --no-build
           else
             echo "No snapshot test project generated; skipping snapshot tests."
           fi
