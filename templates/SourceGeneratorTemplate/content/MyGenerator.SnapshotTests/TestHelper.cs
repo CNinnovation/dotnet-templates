@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace MyGenerator.SnapshotTests;
 
 /// <summary>
@@ -57,7 +59,7 @@ public static class TestHelper
 /// </summary>
 /// <remarks>Invoked automatically at module load time via the ModuleInitializer attribute to ensure consistent
 /// newline handling for verification tests.</remarks>
-public static class ModuleInitializer
+public static class Initializer
 {
     [ModuleInitializer]
     public static void Init() =>
