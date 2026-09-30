@@ -51,3 +51,15 @@ public static class TestHelper
             .UseDirectory("Snapshots");
     }
 }
+
+/// <summary>
+/// Initializes the module by configuring VerifierSettings to normalize newlines when reading content.
+/// </summary>
+/// <remarks>Invoked automatically at module load time via the ModuleInitializer attribute to ensure consistent
+/// newline handling for verification tests.</remarks>
+public static class ModuleInitializer
+{
+    [ModuleInitializer]
+    public static void Init() =>
+        VerifierSettings.FixNewlinesOnRead();
+}
